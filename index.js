@@ -1,8 +1,8 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
-canvas.width = 400;
-canvas.height = 400;
+canvas.width = 800;
+canvas.height = 800;
 
 const cellSize = 100;
 const grid = [];
@@ -10,12 +10,16 @@ const imageSrcs = [
   './tiles/Grass00.png',
   './tiles/Road20.png',
   './tiles/Road21.png',
-  './tiles/Road0.png',
+  './tiles/Road11.png',
+  './tiles/Road22.png',
+  './tiles/Road31.png',
+  './tiles/Road23.png',
 ];
 
 let images = [];
 let tiles = [];
 let isDoneDebug = false;
+let frame = 1;
 
 const init = async () => {
   images = await preload(imageSrcs);
@@ -24,7 +28,10 @@ const init = async () => {
     new Tile(images[0], [0, 0, 0, 0]),
     new Tile(images[1], [1, 1, 0, 0]),
     new Tile(images[2], [0, 1, 1, 0]),
-    new Tile(images[3], [1, 1, 1, 1]),
+    new Tile(images[3], [1, 0, 1, 0]),
+    new Tile(images[4], [0, 0, 1, 1]),
+    new Tile(images[5], [0, 1, 0, 1]),
+    new Tile(images[6], [1, 0, 0, 1]),
   ];
 };
 
@@ -38,18 +45,17 @@ const createGrid = () => {
 
 const waveCollapse = () => {
   // Find cell with min etropy
-  const gridCpy = [...grid];
+  const gridCpy = [...grid].filter((cell) => !cell.collapsed);
   gridCpy.sort((a, b) => a.entropy - b.entropy);
 
-  const filtered = grid.filter(
+  const filtered = gridCpy.filter(
     (cell) => !cell.collapsed && cell.entropy === gridCpy[0].entropy
   );
   const idx = Math.floor(Math.random() * filtered.length);
 
   const newCell = filtered[idx];
-
   newCell.collapsed = true;
-  newCell.entropy = 0;
+  newCell.entropy = -1;
   newCell.options = [
     newCell.options[Math.floor(Math.random() * newCell.options.length)],
   ];
@@ -66,7 +72,11 @@ const waveCollapse = () => {
       newCell.x === grid[i].x &&
       newCell.y - cellSize === grid[i].y
     ) {
-      console.log('top', grid[i]);
+      // console.log('top', grid[i]);
+      grid[i].options = grid[i].options.filter(
+        (tile) => tile.edges[2] === newCell.options[0].edges[0]
+      );
+      grid[i].entropy = grid[i].options.length;
     }
 
     // check right
@@ -75,7 +85,11 @@ const waveCollapse = () => {
       newCell.x + cellSize === grid[i].x &&
       newCell.y === grid[i].y
     ) {
-      console.log('right', grid[i]);
+      // console.log('right', grid[i]);
+      grid[i].options = grid[i].options.filter(
+        (tile) => tile.edges[3] === newCell.options[0].edges[1]
+      );
+      grid[i].entropy = grid[i].options.length;
     }
 
     // check down
@@ -84,7 +98,11 @@ const waveCollapse = () => {
       newCell.x === grid[i].x &&
       newCell.y + 100 === grid[i].y
     ) {
-      console.log('down', grid[i]);
+      // console.log('down', grid[i]);
+      grid[i].options = grid[i].options.filter(
+        (tile) => tile.edges[0] === newCell.options[0].edges[2]
+      );
+      grid[i].entropy = grid[i].options.length;
     }
 
     // check left
@@ -93,28 +111,28 @@ const waveCollapse = () => {
       newCell.x - cellSize === grid[i].x &&
       newCell.y === grid[i].y
     ) {
-      console.log('left', grid[i]);
+      // console.log('left', grid[i]);
+      grid[i].options = grid[i].options.filter(
+        (tile) => tile.edges[1] === newCell.options[0].edges[3]
+      );
+      grid[i].entropy = grid[i].options.length;
     }
   }
-
-  // isDoneDebug = true;
-
-  // console.table(grid);
 };
 
 // const isDone = isDoneDebug; //|| !isDoneDebug && grid.filter((tile) => !tile.collapsed).length > 0;
-const isDone = grid.filter((tile) => !tile.collapsed).length > 0;
+// const isDone = () => grid.filter((tile) => !tile.collapsed).length > 0;
 
 const gameloop = () => {
-  console.log('check is done', isDoneDebug);
-  if (isDone) requestAnimationFrame(gameloop);
+  if (grid.filter((tile) => !tile.collapsed).length > 0)
+    requestAnimationFrame(gameloop);
   waveCollapse();
   grid.forEach((cell) => {
     cell.draw();
   });
+  frame++;
 };
 
-let id;
 init().then(() => {
   createGrid();
   gameloop();

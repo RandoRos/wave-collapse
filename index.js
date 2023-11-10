@@ -1,38 +1,45 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
-canvas.width = 800;
-canvas.height = 800;
+canvas.width = 300;
+canvas.height = 300;
+
+const imgData = [
+  {
+    src: './tiles/Grass00.png',
+    edges: ['000', '000', '000', '000'],
+  },
+  {
+    src: './tiles/Road20.png',
+    edges: ['010', '010', '000', '000'],
+  },
+  {
+    src: './tiles/Road0.png',
+    edges: ['111', '111', '111', '111'],
+  },
+  {
+    src: './tiles/Road33.png',
+    edges: ['000', '011', '111', '110'],
+  },
+  {
+    src: './tiles/Road12.png',
+    edges: ['011', '111', '110', '000'],
+  },
+  {
+    src: './tiles/Road13.png',
+    edges: ['110', '000', '011', '111'],
+  },
+];
 
 const cellSize = 100;
 const grid = [];
-const imageSrcs = [
-  './tiles/Grass00.png',
-  './tiles/Road20.png',
-  './tiles/Road21.png',
-  './tiles/Road11.png',
-  './tiles/Road22.png',
-  './tiles/Road31.png',
-  './tiles/Road23.png',
-];
 
-let images = [];
 let tiles = [];
-let isDoneDebug = false;
 let frame = 1;
 
 const init = async () => {
-  images = await preload(imageSrcs);
-
-  tiles = [
-    new Tile(images[0], [0, 0, 0, 0]),
-    new Tile(images[1], [1, 1, 0, 0]),
-    new Tile(images[2], [0, 1, 1, 0]),
-    new Tile(images[3], [1, 0, 1, 0]),
-    new Tile(images[4], [0, 0, 1, 1]),
-    new Tile(images[5], [0, 1, 0, 1]),
-    new Tile(images[6], [1, 0, 0, 1]),
-  ];
+  tiles = await generateTiles(imgData);
+  console.log(tiles);
 };
 
 const createGrid = () => {
@@ -54,8 +61,14 @@ const waveCollapse = () => {
   const idx = Math.floor(Math.random() * filtered.length);
 
   const newCell = filtered[idx];
+
+  if (newCell.options.length === 0) {
+    return;
+  }
+
   newCell.collapsed = true;
   newCell.entropy = -1;
+
   newCell.options = [
     newCell.options[Math.floor(Math.random() * newCell.options.length)],
   ];
@@ -72,11 +85,7 @@ const waveCollapse = () => {
       newCell.x === grid[i].x &&
       newCell.y - cellSize === grid[i].y
     ) {
-      // console.log('top', grid[i]);
-      grid[i].options = grid[i].options.filter(
-        (tile) => tile.edges[2] === newCell.options[0].edges[0]
-      );
-      grid[i].entropy = grid[i].options.length;
+      grid[i].validateOptions(newCell.options[0].edges.top, 'down');
     }
 
     // check right
@@ -85,24 +94,16 @@ const waveCollapse = () => {
       newCell.x + cellSize === grid[i].x &&
       newCell.y === grid[i].y
     ) {
-      // console.log('right', grid[i]);
-      grid[i].options = grid[i].options.filter(
-        (tile) => tile.edges[3] === newCell.options[0].edges[1]
-      );
-      grid[i].entropy = grid[i].options.length;
+      grid[i].validateOptions(newCell.options[0].edges.right, 'left');
     }
 
     // check down
     if (
-      newCell.y + 100 <= canvas.height &&
+      newCell.y + cellSize <= canvas.height &&
       newCell.x === grid[i].x &&
-      newCell.y + 100 === grid[i].y
+      newCell.y + cellSize === grid[i].y
     ) {
-      // console.log('down', grid[i]);
-      grid[i].options = grid[i].options.filter(
-        (tile) => tile.edges[0] === newCell.options[0].edges[2]
-      );
-      grid[i].entropy = grid[i].options.length;
+      grid[i].validateOptions(newCell.options[0].edges.down, 'top');
     }
 
     // check left
@@ -111,21 +112,15 @@ const waveCollapse = () => {
       newCell.x - cellSize === grid[i].x &&
       newCell.y === grid[i].y
     ) {
-      // console.log('left', grid[i]);
-      grid[i].options = grid[i].options.filter(
-        (tile) => tile.edges[1] === newCell.options[0].edges[3]
-      );
-      grid[i].entropy = grid[i].options.length;
+      grid[i].validateOptions(newCell.options[0].edges.left, 'right');
     }
   }
 };
 
-// const isDone = isDoneDebug; //|| !isDoneDebug && grid.filter((tile) => !tile.collapsed).length > 0;
-// const isDone = () => grid.filter((tile) => !tile.collapsed).length > 0;
-
 const gameloop = () => {
-  if (grid.filter((tile) => !tile.collapsed).length > 0)
+  if (frame < 10 && grid.filter((tile) => !tile.collapsed).length > 0) {
     requestAnimationFrame(gameloop);
+  }
   waveCollapse();
   grid.forEach((cell) => {
     cell.draw();

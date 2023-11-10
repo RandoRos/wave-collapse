@@ -1,6 +1,6 @@
 class Tile {
-  constructor(image, edges = []) {
+  constructor(image, edges = {}) {
     this.image = image;
-    this.edges = edges;
+    this.edges = edges
   }
 }

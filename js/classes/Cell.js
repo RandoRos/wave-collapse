@@ -15,4 +15,17 @@ class Cell {
       ctx.drawImage(tile.image, this.x, this.y, cellSize, cellSize);
     }
   }
+
+  reverse(str) {
+    const arr = str.split('');
+    arr.reverse();
+    return arr.join('');
+  }
+
+  validateOptions(valid, direction) {
+    this.options = this.options.filter(
+      (tile) => tile.edges[direction] === this.reverse(valid)
+    );
+    this.entropy = this.options.length;
+  }
 }

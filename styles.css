@@ -3,6 +3,5 @@
 } */
 
 #canvas {
-  width: 900;
-  height: 600;
+  image-rendering: pixelated;
 }

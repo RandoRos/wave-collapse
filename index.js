@@ -1,44 +1,23 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
-canvas.width = 300;
-canvas.height = 300;
+canvas.width = 600;
+canvas.height = 600;
 
-const imgData = [
-  {
-    src: './tiles/Grass00.png',
-    edges: ['000', '000', '000', '000'],
-  },
-  {
-    src: './tiles/Road20.png',
-    edges: ['010', '010', '000', '000'],
-  },
-  {
-    src: './tiles/Road0.png',
-    edges: ['111', '111', '111', '111'],
-  },
-  {
-    src: './tiles/Road33.png',
-    edges: ['000', '011', '111', '110'],
-  },
-  {
-    src: './tiles/Road12.png',
-    edges: ['011', '111', '110', '000'],
-  },
-  {
-    src: './tiles/Road13.png',
-    edges: ['110', '000', '011', '111'],
-  },
-];
+const DIM = 10;
 
-const cellSize = 100;
+const cellSize = canvas.width / DIM;
 const grid = [];
 
 let tiles = [];
 let frame = 1;
 
 const init = async () => {
-  tiles = await generateTiles(imgData);
+  tiles = await generateTiles(roomsTileset);
+  tiles.forEach(t => {
+
+  });
+
   console.log(tiles);
 };
 
@@ -62,7 +41,7 @@ const waveCollapse = () => {
 
   const newCell = filtered[idx];
 
-  if (newCell.options.length === 0) {
+  if (!newCell || newCell.options.length === 0) {
     return;
   }
 
@@ -119,12 +98,13 @@ const waveCollapse = () => {
 };
 
 const clearCurrect = () => {
-  grid.forEach(cell => cell.current = false)
-}
+  grid.forEach((cell) => (cell.current = false));
+};
 
 const gameloop = () => {
   setTimeout(() => {
-    if (frame < 10 && grid.filter((tile) => !tile.collapsed).length > 0) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (grid.filter((tile) => !tile.collapsed).length > 0) {
       requestAnimationFrame(gameloop);
     }
     waveCollapse();
@@ -133,7 +113,7 @@ const gameloop = () => {
     });
     clearCurrect();
     frame++;
-  }, 1000)
+  }, 0);
 };
 
 init().then(() => {

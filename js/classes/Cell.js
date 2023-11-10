@@ -11,12 +11,29 @@ class Cell {
   draw() {
     if (this.collapsed) {
       const tile = this.options[0];
-      ctx.drawImage(tile.image, this.x, this.y, cellSize, cellSize);
+      ctx.imageSmoothingEnabled = false;
+
+      if (tile.rotation) {
+        ctx.save();
+        ctx.translate(this.x + cellSize / 2, this.y + cellSize / 2);
+        ctx.rotate(tile.rotation * Math.PI/180);
+        ctx.translate(-this.x - cellSize / 2, -this.y - cellSize / 2);
+        ctx.drawImage(tile.image, this.x, this.y, cellSize, cellSize);
+        ctx.restore();
+      } else {
+        ctx.drawImage(tile.image, this.x, this.y, cellSize, cellSize);
+      }
     }
-    console.log(this.current);
+
     if (this.current) {
       ctx.strokeStyle = 'red';
       ctx.strokeRect(this.x, this.y, cellSize, cellSize);
+    }
+
+    if (!this.collapsed) {
+      ctx.fillStyle = 'black';
+      ctx.font = '10px Areal';
+      ctx.fillText(this.entropy, this.x + cellSize / 2, this.y + cellSize / 2);
     }
   }
 

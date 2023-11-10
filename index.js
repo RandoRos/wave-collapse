@@ -1,10 +1,10 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
-canvas.width = 600;
-canvas.height = 600;
+canvas.width = 400;
+canvas.height = 400;
 
-const DIM = 4;
+const DIM = 8;
 
 const cellSize = canvas.width / DIM;
 const grid = [];
@@ -13,7 +13,7 @@ let tiles = [];
 let frame = 1;
 
 const init = async () => {
-  tiles = await generateTiles(circutTileset);
+  tiles = await generateTiles(summerTileset);
   tiles.forEach((t) => {});
 
   console.log(tiles);
@@ -102,7 +102,7 @@ const clearCurrect = () => {
 const gameloop = () => {
   setTimeout(() => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (frame < 2 && grid.filter((tile) => !tile.collapsed).length > 0) {
+    if (grid.filter((tile) => !tile.collapsed).length > 0) {
       requestAnimationFrame(gameloop);
     }
     waveCollapse();
@@ -111,7 +111,7 @@ const gameloop = () => {
     });
     clearCurrect();
     frame++;
-  }, 1000);
+  }, 0);
 };
 
 init().then(() => {

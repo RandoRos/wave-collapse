@@ -4,7 +4,7 @@ const ctx = canvas.getContext('2d');
 canvas.width = 600;
 canvas.height = 600;
 
-const DIM = 10;
+const DIM = 4;
 
 const cellSize = canvas.width / DIM;
 const grid = [];
@@ -13,10 +13,8 @@ let tiles = [];
 let frame = 1;
 
 const init = async () => {
-  tiles = await generateTiles(roomsTileset);
-  tiles.forEach(t => {
-
-  });
+  tiles = await generateTiles(circutTileset);
+  tiles.forEach((t) => {});
 
   console.log(tiles);
 };
@@ -104,7 +102,7 @@ const clearCurrect = () => {
 const gameloop = () => {
   setTimeout(() => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (grid.filter((tile) => !tile.collapsed).length > 0) {
+    if (frame < 2 && grid.filter((tile) => !tile.collapsed).length > 0) {
       requestAnimationFrame(gameloop);
     }
     waveCollapse();
@@ -113,7 +111,7 @@ const gameloop = () => {
     });
     clearCurrect();
     frame++;
-  }, 0);
+  }, 1000);
 };
 
 init().then(() => {

@@ -68,6 +68,7 @@ const waveCollapse = () => {
 
   newCell.collapsed = true;
   newCell.entropy = -1;
+  newCell.current = true;
 
   newCell.options = [
     newCell.options[Math.floor(Math.random() * newCell.options.length)],
@@ -117,15 +118,22 @@ const waveCollapse = () => {
   }
 };
 
+const clearCurrect = () => {
+  grid.forEach(cell => cell.current = false)
+}
+
 const gameloop = () => {
-  if (frame < 10 && grid.filter((tile) => !tile.collapsed).length > 0) {
-    requestAnimationFrame(gameloop);
-  }
-  waveCollapse();
-  grid.forEach((cell) => {
-    cell.draw();
-  });
-  frame++;
+  setTimeout(() => {
+    if (frame < 10 && grid.filter((tile) => !tile.collapsed).length > 0) {
+      requestAnimationFrame(gameloop);
+    }
+    waveCollapse();
+    grid.forEach((cell) => {
+      cell.draw();
+    });
+    clearCurrect();
+    frame++;
+  }, 1000)
 };
 
 init().then(() => {

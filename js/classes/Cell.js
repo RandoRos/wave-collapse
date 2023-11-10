@@ -5,14 +5,18 @@ class Cell {
     this.options = options;
     this.collapsed = false;
     this.entropy = this.options.length;
+    this.current = false;
   }
 
   draw() {
-    ctx.strokeStyle = 'black';
-    ctx.strokeRect(this.x, this.y, cellSize, cellSize);
     if (this.collapsed) {
       const tile = this.options[0];
       ctx.drawImage(tile.image, this.x, this.y, cellSize, cellSize);
+    }
+    console.log(this.current);
+    if (this.current) {
+      ctx.strokeStyle = 'red';
+      ctx.strokeRect(this.x, this.y, cellSize, cellSize);
     }
   }
 
@@ -24,7 +28,7 @@ class Cell {
 
   validateOptions(valid, direction) {
     this.options = this.options.filter(
-      (tile) => tile.edges[direction] === this.reverse(valid)
+      (tile) => this.reverse(tile.edges[direction]) === valid
     );
     this.entropy = this.options.length;
   }

@@ -1,16 +1,17 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
-canvas.width = 400;
-canvas.height = 400;
+canvas.width = 800;
+canvas.height = 800;
 
-const DIM = 8;
+const DIM = 25;
 
 const cellSize = canvas.width / DIM;
 const grid = [];
 
 let tiles = [];
 let frame = 1;
+let clickStop = 1;
 
 const init = async () => {
   tiles = await generateTiles(summerTileset);
@@ -25,6 +26,21 @@ const createGrid = () => {
       grid.push(new Cell(i, j, tiles));
     }
   }
+};
+
+const findRandomTile = (tiles) => {
+  const weights = [tiles[0].weight || 5];
+
+  for (let i = 1; i < tiles.length; i++) {
+    weights[i] = (tiles[i].weight || 5) + weights[i - 1];
+  }
+
+  const random = Math.random() * weights[weights.length - 1];
+
+  for (let i = 0; i < weights.length; i++)
+    if (weights[i] > random) {
+      return tiles[i];
+    }
 };
 
 const waveCollapse = () => {
@@ -47,9 +63,11 @@ const waveCollapse = () => {
   newCell.entropy = -1;
   newCell.current = true;
 
-  newCell.options = [
-    newCell.options[Math.floor(Math.random() * newCell.options.length)],
-  ];
+  // newCell.options = [
+  //   newCell.options[Math.floor(Math.random() * newCell.options.length)],
+  // ];
+
+  newCell.options = [findRandomTile(newCell.options)];
 
   // Check neighbors
   for (let i = 0; i < grid.length; i++) {
@@ -118,3 +136,7 @@ init().then(() => {
   createGrid();
   gameloop();
 });
+
+// window.addEventListener('click', event => {
+//   gameloop();
+// })

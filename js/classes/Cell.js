@@ -12,17 +12,26 @@ class Cell {
     if (this.collapsed) {
       const tile = this.options[0];
       ctx.imageSmoothingEnabled = false;
+      // ctx.globalAlpha = 0.6;
 
       if (tile.rotation) {
         ctx.save();
         ctx.translate(this.x + cellSize / 2, this.y + cellSize / 2);
-        ctx.rotate(tile.rotation * Math.PI/180);
+        ctx.rotate((tile.rotation * Math.PI) / 180);
         ctx.translate(-this.x - cellSize / 2, -this.y - cellSize / 2);
         ctx.drawImage(tile.image, this.x, this.y, cellSize, cellSize);
         ctx.restore();
       } else {
         ctx.drawImage(tile.image, this.x, this.y, cellSize, cellSize);
       }
+
+      // ctx.fillStyle = 'yellow';
+      // ctx.font = '20px Areal';
+      // ctx.fillText(tile.edges.top, this.x + cellSize / 2, this.y + 20);
+
+      // ctx.fillStyle = 'yellow';
+      // ctx.font = '20px Areal';
+      // ctx.fillText(tile.edges.down, this.x + cellSize / 2, this.y + cellSize - 10);
     }
 
     if (this.current) {

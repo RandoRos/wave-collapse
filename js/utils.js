@@ -6,7 +6,7 @@ const generateTiles = async (data) => {
       new Promise((resolve, reject) => {
         const img = new Image();
         img.onload = () => {
-          const tile = new Tile(img, new Edge(...image.edges));
+          const tile = new Tile(img, image.weight, new Edge(...image.edges));
           const result = [];
           result.push(tile);
 

@@ -1,8 +1,9 @@
 class Tile {
-  constructor(image, edges = {}, rotation) {
+  constructor(image, weight, edges = {}, rotation) {
     this.image = image;
     this.edges = edges;
     this.rotation = rotation;
+    this.weight = weight
   }
 
   rotate(num = 1) {
@@ -13,6 +14,6 @@ class Tile {
       newEdges[(i + num) % 4] = this.edges[arr[i]];
     }
 
-    return new Tile(this.image, new Edge(...newEdges), num * 90);
+    return new Tile(this.image, this.weight, new Edge(...newEdges), num * 90);
   }
 }

@@ -1,10 +1,10 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
-canvas.width = 800;
-canvas.height = 800;
+canvas.width = 600;
+canvas.height = 600;
 
-const DIM = 25;
+const DIM = 10;
 
 const cellSize = canvas.width / DIM;
 const grid = [];
@@ -15,8 +15,6 @@ let clickStop = 1;
 
 const init = async () => {
   tiles = await generateTiles(summerTileset);
-  tiles.forEach((t) => {});
-
   console.log(tiles);
 };
 
@@ -26,6 +24,15 @@ const createGrid = () => {
       grid.push(new Cell(i, j, tiles));
     }
   }
+};
+
+const createNeighbors = () => {
+  grid.forEach((c, i) => {
+    if (c.x > 0) c.neighbors.set('left', grid[i - DIM]);
+    if (c.x < canvas.width - cellSize) c.neighbors.set('right', grid[i + DIM]);
+    if (c.y > 0) c.neighbors.set('top', grid[i - 1]);
+    if (c.y < canvas.height - cellSize) c.neighbors.set('down', grid[i + 1]);
+  });
 };
 
 const findRandomTile = (tiles) => {
@@ -113,6 +120,68 @@ const waveCollapse = () => {
   }
 };
 
+const waveCollapse2 = () => {
+  const gridCpy = [...grid].filter((cell) => !cell.collapsed);
+  gridCpy.sort((a, b) => a.entropy - b.entropy);
+
+  const filtered = gridCpy.filter(
+    (cell) => !cell.collapsed && cell.entropy === gridCpy[0].entropy
+  );
+
+  const idx = Math.floor(Math.random() * filtered.length);
+  const cell = filtered[idx];
+
+  if (!cell || cell.options.length === 0) {
+    return;
+  }
+
+  cell.collapsed = true;
+  cell.entropy = -1;
+  cell.current = true;
+  cell.options = [findRandomTile(cell.options)];
+
+  const stack = [];
+  stack.push(cell);
+
+  while (stack.length) {
+    const el = stack.pop();
+    if (el.neighbors.has('left')) {
+      const left = el.neighbors.get('left');
+      if (!left.collapsed) {
+        el.options.forEach((op) => {
+          left.validateOptions(op.edges.left, 'right');
+        });
+        if (left.options.length < tiles.length) {
+          stack.push(left);
+        }
+        left.validate2(el.options, 'right');
+      }
+    }
+  }
+
+  // Check neighbors
+  // if (cell.neighbors.has('left')) {
+  //   cell.neighbors
+  //     .get('left')
+  //     .validateOptions(cell.options[0].edges.left, 'right');
+  // }
+  // if (cell.neighbors.has('right')) {
+  //   cell.neighbors
+  //     .get('right')
+  //     .validateOptions(cell.options[0].edges.right, 'left');
+  // }
+  // if (cell.neighbors.has('top')) {
+  //   cell.neighbors
+  //     .get('top')
+  //     .validateOptions(cell.options[0].edges.top, 'down');
+  // }
+  // if (cell.neighbors.has('down')) {
+  //   cell.neighbors
+  //     .get('down')
+  //     .validateOptions(cell.options[0].edges.down, 'top');
+  // }
+};
+
 const clearCurrect = () => {
   grid.forEach((cell) => (cell.current = false));
 };
@@ -120,10 +189,11 @@ const clearCurrect = () => {
 const gameloop = () => {
   setTimeout(() => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (grid.filter((tile) => !tile.collapsed).length > 0) {
-      requestAnimationFrame(gameloop);
-    }
-    waveCollapse();
+    // if (grid.filter((tile) => !tile.collapsed).length > 0) {
+    //   requestAnimationFrame(gameloop);
+    // }
+    //waveCollapse();
+    waveCollapse2();
     grid.forEach((cell) => {
       cell.draw();
     });
@@ -134,9 +204,10 @@ const gameloop = () => {
 
 init().then(() => {
   createGrid();
+  createNeighbors();
   gameloop();
 });
 
-// window.addEventListener('click', event => {
-//   gameloop();
-// })
+window.addEventListener('click', (event) => {
+  gameloop();
+});

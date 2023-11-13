@@ -1,5 +1,5 @@
 const grassWeight = 30;
-const waterWeight = 80;
+const waterWeight = 50;
 
 const summerTileset = [
   {

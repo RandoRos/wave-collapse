@@ -6,6 +6,7 @@ class Cell {
     this.collapsed = false;
     this.entropy = this.options.length;
     this.current = false;
+    this.neighbors = new Map();
   }
 
   draw() {
@@ -40,9 +41,32 @@ class Cell {
     }
 
     if (!this.collapsed) {
-      ctx.fillStyle = 'black';
-      ctx.font = '10px Areal';
-      ctx.fillText(this.entropy, this.x + cellSize / 2, this.y + cellSize / 2);
+      if (this.entropy < 10) {
+        ctx.fillStyle = 'lightgreen';
+        ctx.font = 'bold 12px Areal';
+        ctx.fillText(
+          this.entropy,
+          this.x + cellSize / 2,
+          this.y + cellSize / 2
+        );
+        if (this.entropy === 0) {
+          ctx.fillStyle = 'red';
+          ctx.font = 'bold 12px Areal';
+          ctx.fillText(
+            this.entropy,
+            this.x + cellSize / 2,
+            this.y + cellSize / 2
+          );
+        }
+      } else {
+        ctx.fillStyle = 'black';
+        ctx.font = '10px Areal';
+        ctx.fillText(
+          this.entropy,
+          this.x + cellSize / 2,
+          this.y + cellSize / 2
+        );
+      }
     }
   }
 
@@ -57,5 +81,20 @@ class Cell {
       (tile) => this.reverse(tile.edges[direction]) === valid
     );
     this.entropy = this.options.length;
+  }
+
+  validate2(arr, direction) {
+    console.log('valid arr', arr);
+    console.log('options', this.options);
+    const valid = [];
+    this.options.forEach((tile) => {
+      arr.forEach((val) => {
+        console.log(tile.edges[direction], val.edges.left);
+        if (this.reverse(tile.edges[direction]) === val.edges.left) {
+          valid.push(tile);
+        }
+      })
+    })
+    console.log(valid);
   }
 }

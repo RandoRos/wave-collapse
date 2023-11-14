@@ -84,21 +84,21 @@ class Cell {
   }
 
   validate2(arr, direction1, direction2) {
-    console.log('arr', arr)
-    const cpy = [...this.options];
+    //console.log('validation arr', arr)
+    const cpy = [];
     for (let i = 0; i < this.options.length; i++) {
       for (let j = 0; j < arr.length; j++) {
-        if (this.reverse(this.options[i].edges[direction2]) !== arr[j].edges[direction1]) {
-          console.log('check', this.options[i]);
-          console.log('check2', arr[j]);
-          cpy.splice(i, 1);
-          console.log('cpy', cpy);
+        //console.log(`compare ${this.options[i].name} - ${direction2} [${this.options[i].edges[direction2]}] to ${arr[j].name} - ${direction1} [${arr[j].edges[direction1]}]`);
+        if (this.reverse(this.options[i].edges[direction2]) === arr[j].edges[direction1]) {
+          //console.log('push da'),
+          cpy.push(this.options[i])
           break;
         }
       }
+      //console.table('cpy', cpy.map(e => e.name));
     }
     this.options = cpy;
     this.entropy = this.options.length;
-    console.log('this.options', this.options);
+    //console.log('this.options', this.options.map(e => e.name));
   }
 }

@@ -1,10 +1,10 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
-canvas.width = 600;
-canvas.height = 600;
+canvas.width = 800;
+canvas.height = 800;
 
-const DIM = 3;
+const DIM = 40;
 
 const cellSize = canvas.width / DIM;
 const grid = [];
@@ -141,18 +141,34 @@ const waveCollapse2 = () => {
   cell.options = [findRandomTile(cell.options)];
 
   const stack = [];
+  const visited = [];
+
   stack.push(cell);
 
+  let killLoop = 1;
+  //console.log('STARTING LOOP!');
   while (stack.length) {
-    console.log('stack', stack);
+    // if (killLoop === 20) {
+    //   console.log(stack);
+    //   console.log('process deadlock, killing loop');
+    //   break;
+    // }
+    // console.log(
+    //   'stack',
+    //   stack.map((e) => `x${e.x} y${e.y}`)
+    // );
     const el = stack.pop();
+    visited.push(el);
+    //console.log('processing: x' + el.x + ' y' + el.y);
     if (el.neighbors.has('left')) {
       const left = el.neighbors.get('left');
       if (!left.collapsed) {
         left.validate2(el.options, 'left', 'right');
-        console.log('left', left.options);
+        //console.log('left', left.options);
         if (left.options.length < tiles.length) {
-          //stack.push(left);
+          if (!stack.includes(left) && !visited.includes(left)) {
+            stack.push(left);
+          }
         }
       }
     }
@@ -161,9 +177,11 @@ const waveCollapse2 = () => {
       const right = el.neighbors.get('right');
       if (!right.collapsed) {
         right.validate2(el.options, 'right', 'left');
-        console.log('right', right.options);
+        //console.log('right', right.options);
         if (right.options.length < tiles.length) {
-          //stack.push(right);
+          if (!stack.includes(right) && !visited.includes(right)) {
+            stack.push(right);
+          }
         }
       }
     }
@@ -172,9 +190,11 @@ const waveCollapse2 = () => {
       const top = el.neighbors.get('top');
       if (!top.collapsed) {
         top.validate2(el.options, 'top', 'down');
-        console.log('top', top.options);
+        //console.log('top', top.options);
         if (top.options.length < tiles.length) {
-          //stack.push(top);
+          if (!stack.includes(top) && !visited.includes(top)) {
+            stack.push(top);
+          }
         }
       }
     }
@@ -183,15 +203,16 @@ const waveCollapse2 = () => {
       const down = el.neighbors.get('down');
       if (!down.collapsed) {
         down.validate2(el.options, 'down', 'top');
-        console.log('down', down.options);
-        console.log(tiles.length);
+        //console.log('down', down.options);
+        //console.log(tiles.length);
         if (down.options.length < tiles.length) {
-          console.log('push');
-          //stack.push(down);
+          if (!stack.includes(down) && !visited.includes(down)) {
+            stack.push(down);
+          }
         }
       }
     }
-    console.log('stack', stack);
+    killLoop++;
   }
 
   // Check neighbors
@@ -224,9 +245,9 @@ const clearCurrect = () => {
 const gameloop = () => {
   setTimeout(() => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    // if (grid.filter((tile) => !tile.collapsed).length > 0) {
-    //   requestAnimationFrame(gameloop);
-    // }
+    if (grid.filter((tile) => !tile.collapsed).length > 0) {
+      requestAnimationFrame(gameloop);
+    }
     //waveCollapse();
     waveCollapse2();
     grid.forEach((cell) => {
@@ -240,7 +261,6 @@ const gameloop = () => {
 init().then(() => {
   createGrid();
   createNeighbors();
-  console.log(grid);
   gameloop();
 });
 

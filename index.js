@@ -4,7 +4,7 @@ const ctx = canvas.getContext('2d');
 canvas.width = 600;
 canvas.height = 600;
 
-const DIM = 10;
+const DIM = 3;
 
 const cellSize = canvas.width / DIM;
 const grid = [];
@@ -21,7 +21,7 @@ const init = async () => {
 const createGrid = () => {
   for (let i = 0; i < canvas.width; i += cellSize) {
     for (let j = 0; j < canvas.height; j += cellSize) {
-      grid.push(new Cell(i, j, tiles));
+      grid.push(new Cell(i, j, [...tiles]));
     }
   }
 };
@@ -144,19 +144,54 @@ const waveCollapse2 = () => {
   stack.push(cell);
 
   while (stack.length) {
+    console.log('stack', stack);
     const el = stack.pop();
     if (el.neighbors.has('left')) {
       const left = el.neighbors.get('left');
       if (!left.collapsed) {
-        el.options.forEach((op) => {
-          left.validateOptions(op.edges.left, 'right');
-        });
+        left.validate2(el.options, 'left', 'right');
+        console.log('left', left.options);
         if (left.options.length < tiles.length) {
-          stack.push(left);
+          //stack.push(left);
         }
-        left.validate2(el.options, 'right');
       }
     }
+
+    if (el.neighbors.has('right')) {
+      const right = el.neighbors.get('right');
+      if (!right.collapsed) {
+        right.validate2(el.options, 'right', 'left');
+        console.log('right', right.options);
+        if (right.options.length < tiles.length) {
+          //stack.push(right);
+        }
+      }
+    }
+
+    if (el.neighbors.has('top')) {
+      const top = el.neighbors.get('top');
+      if (!top.collapsed) {
+        top.validate2(el.options, 'top', 'down');
+        console.log('top', top.options);
+        if (top.options.length < tiles.length) {
+          //stack.push(top);
+        }
+      }
+    }
+
+    if (el.neighbors.has('down')) {
+      const down = el.neighbors.get('down');
+      if (!down.collapsed) {
+        down.validate2(el.options, 'down', 'top');
+        console.log('down', down.options);
+        console.log(tiles.length);
+        if (down.options.length < tiles.length) {
+          console.log('push');
+          //stack.push(down);
+        }
+      }
+    }
+    console.log('stack', stack);
   }
 
   // Check neighbors
@@ -205,6 +240,7 @@ const gameloop = () => {
 init().then(() => {
   createGrid();
   createNeighbors();
+  console.log(grid);
   gameloop();
 });
 

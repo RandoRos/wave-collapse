@@ -1,5 +1,6 @@
 class Tile {
-  constructor(image, weight, edges = {}, rotation) {
+  constructor(name, image, weight, edges = {}, rotation) {
+    this.name = name;
     this.image = image;
     this.edges = edges;
     this.rotation = rotation;

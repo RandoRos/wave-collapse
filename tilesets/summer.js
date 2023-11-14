@@ -1,8 +1,9 @@
-const grassWeight = 30;
+const grassWeight = 80;
 const waterWeight = 50;
 
 const summerTileset = [
   {
+    name: 'GRASS',
     src: './tiles/summer/grass0.png',
     edges: ['000', '000', '000', '000'],
     weight: grassWeight,
@@ -60,16 +61,19 @@ const summerTileset = [
   //   edges: ['111', '110', '011', '111'],
   // },
   {
+    name: 'WATER_A',
     src: './tiles/summer/water_a.png',
     edges: ['333', '333', '333', '333'],
     weight: waterWeight,
   },
   {
+    name: 'WATER_B',
     src: './tiles/summer/water_b.png',
     edges: ['333', '333', '333', '333'],
     weight: waterWeight,
   },
   {
+    name: 'WATER_C',
     src: './tiles/summer/water_c.png',
     edges: ['333', '333', '333', '333'],
     weight: waterWeight,

@@ -83,18 +83,22 @@ class Cell {
     this.entropy = this.options.length;
   }
 
-  validate2(arr, direction) {
-    console.log('valid arr', arr);
-    console.log('options', this.options);
-    const valid = [];
-    this.options.forEach((tile) => {
-      arr.forEach((val) => {
-        console.log(tile.edges[direction], val.edges.left);
-        if (this.reverse(tile.edges[direction]) === val.edges.left) {
-          valid.push(tile);
+  validate2(arr, direction1, direction2) {
+    console.log('arr', arr)
+    const cpy = [...this.options];
+    for (let i = 0; i < this.options.length; i++) {
+      for (let j = 0; j < arr.length; j++) {
+        if (this.reverse(this.options[i].edges[direction2]) !== arr[j].edges[direction1]) {
+          console.log('check', this.options[i]);
+          console.log('check2', arr[j]);
+          cpy.splice(i, 1);
+          console.log('cpy', cpy);
+          break;
         }
-      })
-    })
-    console.log(valid);
+      }
+    }
+    this.options = cpy;
+    this.entropy = this.options.length;
+    console.log('this.options', this.options);
   }
 }
